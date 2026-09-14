@@ -133,7 +133,7 @@ Paths are package-relative, case-insensitive ASCII, with no parent traversal, ab
 
 The production stack is a Coolify Docker Compose service in `hostinger-always-online / production`, on the Hostinger server. `coolify-compose.yaml` is the reproducible service definition. Coolify generates the Django secret and database password and manages the HTTPS route to port 8000. PostgreSQL has a persistent volume and no public port.
 
-Source is in `server/`. Build a local Docker image on the Hostinger server with `docker build -t uvm-registry:0.3.0 server`, then deploy/restart through **Coolify**. `pull_policy: never` makes this explicit; the image must exist on that server. The source archive contains the full implementation and tests. This V1 is managed by Coolify but does not yet have Git push auto-deployment.
+Source is in `server/`. Build a local Docker image on the Hostinger server with `docker build -t uvm-registry:0.2.0 server`, matching `coolify-compose.yaml`, then deploy/restart through **Coolify**. The deployment image tag is independent of the mod/CLI version. `pull_policy: never` makes this explicit; the image must exist on that server. The source archive contains the full implementation and tests. This V1 is managed by Coolify but does not yet have Git push auto-deployment.
 
 The container runs without root, migrates its database on startup and serves through Gunicorn. Back up PostgreSQL before upgrades. Keep off-server database backups; a persistent volume alone is not a backup. Restore data into a separate test database before a production rollback. Existing signing keys, revocations and signatures must be preserved across deployments.
 
