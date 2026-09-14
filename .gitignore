@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/__pycache__/
+**/.venv/
+**/node_modules/
+**/.env
+**/*.sqlite3
+**/staticfiles/
+artifacts/
+*.p8
+*.pem
+*.key
+.uvm/
+server/downloads/
+*.dpapi

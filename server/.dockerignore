@@ -1,0 +1,7 @@
+__pycache__
+**/__pycache__
+.env
+*.sqlite3
+.venv
+staticfiles
+tests-output

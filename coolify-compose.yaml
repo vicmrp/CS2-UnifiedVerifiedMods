@@ -1,0 +1,42 @@
+# Paste into Coolify: New Resource > Docker Compose, on the Hostinger server.
+# Build the pinned local image with server/Dockerfile before deploying.
+services:
+  registry:
+    image: uvm-registry:0.2.0
+    pull_policy: never
+    environment:
+      - SERVICE_FQDN_REGISTRY_8000
+      - UVM_SECRET_KEY=$SERVICE_PASSWORD_64_UVM
+      - UVM_ORIGIN=https://vezit.net
+      - UVM_ALLOWED_HOSTS=vezit.net,localhost,127.0.0.1
+      - POSTGRES_HOST=database
+      - POSTGRES_DB=uvm
+      - POSTGRES_USER=uvm
+      - POSTGRES_PASSWORD=$SERVICE_PASSWORD_64_DATABASE
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 1.0
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  database:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=uvm
+      - POSTGRES_USER=uvm
+      - POSTGRES_PASSWORD=$SERVICE_PASSWORD_64_DATABASE
+    volumes:
+      - uvm-database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U uvm -d uvm']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 384m
+volumes:
+  uvm-database:

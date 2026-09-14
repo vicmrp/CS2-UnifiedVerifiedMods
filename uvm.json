@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "platform": "paradox",
+  "modId": "159198",
+  "repository": "https://github.com/vicmrp/CS2-UnifiedVerifiedMods",
+  "build": {"project": "UVM.Mod/UVM.Mod.csproj", "configuration": "Release"},
+  "output": ["UVM.dll"]
+}

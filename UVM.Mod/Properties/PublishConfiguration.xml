@@ -1,0 +1,34 @@
+<Publish>
+  <ModId Value="159198" />
+  <DisplayName Value="Unified Verified Mods" />
+  <ShortDescription Value="Compare downloaded code mods with signed, reproducible build evidence from GitHub accounts." />
+  <LongDescription>
+Unified Verified Mods connects downloaded Cities: Skylines II code mods to public source code and signed build evidence at https://vezit.net.
+
+## For players
+
+Subscribe and enable this mod in your playset, then restart the game. Open Options &gt; Unified Verified Mods &gt; Scan and select Scan downloaded mods. In Report, choose a mod by name and installed version. REPRODUCED means its files match signed build evidence; Verified by lists the GitHub accounts whose signatures were checked. UNKNOWN means no matching evidence; UNAVAILABLE means the check could not complete or the package has no supported code. The cache may include disabled mods and older versions. You do not need Node, a GitHub account or the command-line tool to scan.
+
+The scanner hashes files in the background. Only mod IDs, relative paths and SHA-256 hashes are sent to vezit.net; mod DLLs are not uploaded. Scans happen when you request them.
+
+## For mod authors
+
+Keep your source public and commit the exact source used for each release. Add a small uvm.json containing the Paradox mod ID, project, build configuration and every output file. Install the UVM CLI from vezit.net and register your GitHub signing identity using a signed public gist. Run uvm publish to build and sign the release manifest, then upload that exact package to Paradox. Include native libraries and UI files in the recipe. Do not change the package after recording its hashes.
+
+## For third-party verifiers
+
+Use your own GitHub account and signing key. Inspect the source before running a build. Obtain the release manifest from vezit.net, clone the linked repository and check out its exact commit. Install the recorded SDK and matching CS2 game/toolchain files. Run uvm build into an empty folder, then uvm verify against the published manifest and uvm attest to sign your actual rebuild result. Players can inspect the public signature and your GitHub identity. Repeated submissions or several keys from one GitHub account count as one account.
+
+Full commands and the MIT-licensed source are in the linked GitHub README.
+
+## What verification means
+
+Reproducibility is evidence that bytes match the declared source build. It is not a security audit or a guarantee that a mod is safe. Author self-verification is shown separately from builds reported by other accounts. The registry does not execute or review source code for you.
+  </LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="0.3.0" />
+  <GameVersion Value="1.6.*" />
+  <ChangeLog Value="First public release. Native C# Options report, cached mod names and versions, local SHA-256 hashing, signature validation and GitHub verifier identities." />
+  <ExternalLink Type="github" Url="https://github.com/vicmrp/CS2-UnifiedVerifiedMods/" />
+  <AccessLevel Value="Public" />
+</Publish>
