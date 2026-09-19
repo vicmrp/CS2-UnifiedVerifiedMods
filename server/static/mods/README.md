@@ -1,0 +1,1 @@
+Listing artwork for the corresponding Paradox mod IDs, copied from the downloaded package metadata (UVM uses its publisher thumbnail). Artwork is descriptive only and is not signed build evidence. Add an ID-named PNG here when curating a new registry listing; otherwise the UVM mark is shown.

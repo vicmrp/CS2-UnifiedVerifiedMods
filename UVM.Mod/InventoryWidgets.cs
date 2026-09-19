@@ -49,7 +49,7 @@ namespace Uvm
                 "Verified by: "+Clean(string.Join(", ",(build["verified_by"] as JArray??new JArray()).Select(x=>(string)x)))+"\n"+
                 "Paradox ID: "+Clean((string)r["mod_id"]??"local")+" · revision "+Clean((string)r["paradox_revision"]??"—")+"\n"+
                 "Compiled API references: "+(r["capabilities"] as JArray??new JArray()).Count(c=>(string)c["category"]!="coverage")+" (not proof of execution).\n"+
-                "Open Observe > Cities II mods for processes, network and file evidence. A matching build is not a safety audit.";
+                "Open Observe > Cities II mods for processes, network and file evidence. Use Inform the modder there for a copyable UVM request and the Paradox listing. A matching build is not a safety audit.";
         }
         sealed class StatusWriter:IWriter<JObject>
         {

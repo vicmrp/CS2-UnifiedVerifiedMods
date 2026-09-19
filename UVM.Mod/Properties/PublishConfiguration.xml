@@ -26,9 +26,9 @@ Full commands and the MIT-licensed source are in the linked GitHub README.
 Reproducibility is evidence that bytes match the declared source build. It is not a security audit or a guarantee that a mod is safe. Author self-verification is shown separately from builds reported by other accounts. The registry does not execute or review source code for you.
   </LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
-  <ModVersion Value="0.5.0" />
+  <ModVersion Value="0.6.0" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog Value="Adds the optional local Observe bridge with automatic reconnection, synchronized code/loaded filters, native mod inventory and recent-connection status. Fixes Windows pipe ownership compatibility. Adds an Observer installation link. Build evidence remains separate from runtime activity." />
+  <ChangeLog Value="Adds guidance for requesting UVM evidence from authors through Observe. Adds the optional local Observe bridge with automatic reconnection, synchronized code/loaded filters, native mod inventory and recent-connection status. Fixes Windows pipe ownership compatibility. Adds an Observer installation link. Build evidence remains separate from runtime activity." />
   <ExternalLink Type="github" Url="https://github.com/vicmrp/CS2-UnifiedVerifiedMods/" />
   <AccessLevel Value="Public" />
 </Publish>

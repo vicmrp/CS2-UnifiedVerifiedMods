@@ -5,7 +5,7 @@ The registry stores metadata, file hashes, GitHub account proofs and signatures.
 
 ## For players
 
-The **UVM 0.5.0 / Observe 0.11.0-beta-vibe-coded** integration adds native mod rows and a local connection indicator under Scan, automatic reconnection and synchronized filters. Download the [UVM bridge beta](https://github.com/vicmrp/CS2-UnifiedVerifiedMods/releases/tag/v0.5.0-beta) and [Observe installer](https://github.com/vicmrp/SEC-Observer/releases/tag/v0.11.0-beta-vibe-coded). See [OBSERVE_BRIDGE.md](OBSERVE_BRIDGE.md) for setup, evidence limits and the optional mod activity API. The bridge beta is distributed separately from the published Paradox 0.3.0 package below. Do not load both copies in one playset.
+The **UVM 0.6.0 / Observe 0.12.0-beta-vibe-coded** integration adds native mod rows and a local connection indicator under Scan, automatic reconnection and synchronized filters. Download the [UVM bridge beta](https://github.com/vicmrp/CS2-UnifiedVerifiedMods/releases/tag/v0.6.0) and [Observe installer](https://github.com/vicmrp/SEC-Observer/releases/tag/v0.12.0-beta-vibe-coded). See [OBSERVE_BRIDGE.md](OBSERVE_BRIDGE.md) for setup, evidence limits and the optional mod activity API. Use the new Paradox release when available, or the GitHub package. Do not load both copies in one playset.
 
 Download `UVM-v0.3.0.zip` from https://vezit.net and extract it.
 
@@ -144,3 +144,7 @@ Local server development: Python 3.13, `pip install -r server/requirements.txt`,
 Tests: `python server/manage.py test registry`; `dotnet build tests/UVM.Tests.csproj -c Release`; run both framework outputs with a temporary fixture directory, then `python tests/check_cross_runtime.py <fixture-directory>/cross-runtime-proof.json`. These tests use local evidence and never add fake attestations to production.
 
 Reference documentation: [GitHub gist API](https://docs.github.com/en/rest/gists/gists), [Django deployment checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/), [Coolify Compose](https://coolify.io/docs/applications/builds/docker-compose).
+
+## 0.6 release
+
+Registry listings now include locally hosted Paradox artwork and a separate link opening the mod page in a new tab. Optional analytics includes a plain-language explanation at `/analytics/`. Observe 0.12 adds an expandable **Inform the modder** request, a copy button and a Paradox page button. Players review and post their own request; nothing is posted automatically. Artwork and listing links are descriptive metadata, not signed evidence.

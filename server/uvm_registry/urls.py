@@ -1,6 +1,7 @@
 from django.urls import path
 from registry import views
-urlpatterns = [path('',views.index),path('healthz',views.health),
+urlpatterns = [path('',views.index),
+    path('analytics/',views.analytics_info),path('healthz',views.health),
  path('downloads/<str:filename>',views.download),
  path('api/v1/mods',views.mods),path('api/v1/mods/<str:platform>/<str:mod_id>',views.mod_detail),
  path('api/v1/mods/<str:platform>/<str:mod_id>/releases/<str:version>',views.version_detail),

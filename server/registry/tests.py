@@ -141,3 +141,19 @@ class RegistryTests(TestCase):
         expected={'x.dll':'a'*64}
         self.assertTrue(package_matches({**expected,'readme.md':'b'*64},expected))
         self.assertFalse(package_matches({**expected,'ui/hidden.js':'b'*64},expected))
+
+    def test_listing_artwork_and_analytics_explanation(self):
+        self.post('attestations',self.sign(self.body()))
+        listing=self.client.get('/api/v1/mods').json()['results'][0]
+        self.assertEqual(listing['image_url'],'/static/mods/155518.png')
+        detail=self.client.get('/api/v1/mods/paradox/155518').json()
+        self.assertEqual(detail['image_url'],listing['image_url'])
+        from .models import Mod
+        from .views import artwork
+        self.assertEqual(artwork(Mod(platform='paradox',platform_id='../secret')),'/static/mark.svg')
+        self.assertEqual(artwork(Mod(platform='paradox',platform_id='999999')),'/static/mark.svg')
+        page=self.client.get('/analytics/')
+        self.assertContains(page,'Someone was here :-)')
+        self.assertNotContains(page,'<script')
+        self.assertContains(page,'No thanks')
+        self.assertContains(self.client.get('/'),'Let me know <a href="/analytics/">someone</a> was here :-)')

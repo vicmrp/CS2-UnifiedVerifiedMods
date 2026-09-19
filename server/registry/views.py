@@ -15,6 +15,16 @@ from .protocol import public_key, verify, recent, validate_files, validate_manif
 from .github import read_key_proof
 
 def index(request): return render(request, 'index.html')
+def analytics_info(request): return render(request, 'analytics.html')
+
+def artwork(mod):
+    # Never use user-supplied URLs or paths for images. Listing metadata is not evidence.
+    mod_id = mod.platform_id
+    if mod.platform == 'paradox' and mod_id.isascii() and mod_id.isdigit():
+        if (settings.BASE_DIR / 'static' / 'mods' / (mod_id + '.png')).is_file():
+            return '/static/mods/' + mod_id + '.png'
+    return '/static/mark.svg'
+
 def download(request,filename):
     allowed={'UVM-v0.2.0.zip','UVM-source-v0.2.0.zip','UVM-v0.3.0.zip','UVM-source-v0.3.0.zip','README.md','USER_GUIDE.md','SHA256SUMS.txt'}
     path=settings.BASE_DIR/'downloads'/filename
@@ -52,7 +62,7 @@ def mods(request):
     results=[]
     for mod in found:
         latest = mod.releases.order_by('-created_at').first()
-        results.append({'platform':mod.platform,'mod_id':mod.platform_id,'name':mod.name,
+        results.append({'platform':mod.platform,'mod_id':mod.platform_id,'name':mod.name,'image_url':artwork(mod),
                         'latest':summary(latest) if latest else None})
     return Response({'results':results,'stats':{'mods':Mod.objects.count(),'releases':Release.objects.count(),
                      'verifiers':Verifier.objects.count(),'attestations':Attestation.objects.count()}})
@@ -60,7 +70,7 @@ def mods(request):
 @api_view(['GET'])
 def mod_detail(request,platform,mod_id):
     mod=get_object_or_404(Mod,platform=platform,platform_id=mod_id)
-    return Response({'platform':platform,'mod_id':mod_id,'name':mod.name,
+    return Response({'platform':platform,'mod_id':mod_id,'name':mod.name,'image_url':artwork(mod),
                       'releases':[summary(r) for r in mod.releases.order_by('-created_at')[:100]]})
 
 @api_view(['GET'])
