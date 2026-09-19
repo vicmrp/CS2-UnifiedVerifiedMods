@@ -3,7 +3,7 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyName>UVM</AssemblyName>
-    <Version>0.3.0</Version>
+    <Version>0.5.0</Version>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <PathMap>$(MSBuildProjectDirectory)/..=/_/source</PathMap>
@@ -17,7 +17,16 @@
     <Reference Include="Colossal.Logging"><HintPath>$(GameManagedPath)/Colossal.Logging.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManagedPath)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Newtonsoft.Json"><HintPath>$(GameManagedPath)/Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(GameManagedPath)/Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><HintPath>$(GameManagedPath)/Unity.Entities.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><HintPath>$(GameManagedPath)/Colossal.Mathematics.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Colossal.UI.Binding"><HintPath>$(GameManagedPath)/Colossal.UI.Binding.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mono.Cecil"><HintPath>$(GameManagedPath)/Colossal.Mono.Cecil.dll</HintPath><Private>false</Private></Reference>
+    <Compile Include="../Shared/ObserveProtocol.cs" Link="ObserveProtocol.cs" />
+    <Compile Include="../Shared/BridgeFilters.cs" Link="BridgeFilters.cs" />
+    <Compile Include="../Shared/ModCodeClassifier.cs" Link="ModCodeClassifier.cs" />
     <Compile Include="../Shared/Scanner.cs" Link="Scanner.cs" />
   </ItemGroup>
 </Project>

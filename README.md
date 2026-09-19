@@ -5,6 +5,8 @@ The registry stores metadata, file hashes, GitHub account proofs and signatures.
 
 ## For players
 
+The **UVM 0.5.0 / Observe 0.11.0-beta-vibe-coded** integration adds native mod rows and a local connection indicator under Scan, automatic reconnection and synchronized filters. Download the [UVM bridge beta](https://github.com/vicmrp/CS2-UnifiedVerifiedMods/releases/tag/v0.5.0-beta) and [Observe installer](https://github.com/vicmrp/SEC-Observer/releases/tag/v0.11.0-beta-vibe-coded). See [OBSERVE_BRIDGE.md](OBSERVE_BRIDGE.md) for setup, evidence limits and the optional mod activity API. The bridge beta is distributed separately from the published Paradox 0.3.0 package below. Do not load both copies in one playset.
+
 Download `UVM-v0.3.0.zip` from https://vezit.net and extract it.
 
 * **CLI:** the `cli` folder contains `UVM.Cli.exe` and its dependencies. Install the .NET 10 runtime, then run `./cli/UVM.Cli.exe help`. Use this executable directly if you already have another `uvm` tool installed. For the command examples below, `uvm` means this executable. Building mods additionally requires a .NET SDK and the CS2 modding toolchain.

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup><OutputType>Exe</OutputType><TargetFrameworks>net10.0;net48</TargetFrameworks><LangVersion>latest</LangVersion></PropertyGroup>
- <ItemGroup><PackageReference Include="Newtonsoft.Json" Version="13.0.4"/><Compile Include="../Shared/Scanner.cs" Link="Scanner.cs"/></ItemGroup>
+ <ItemGroup><PackageReference Include="Newtonsoft.Json" Version="13.0.4"/><Compile Include="../Shared/Scanner.cs" Link="Scanner.cs"/><Compile Include="../Shared/ModCodeClassifier.cs" Link="ModCodeClassifier.cs"/></ItemGroup>
+ <ItemGroup><Compile Include="../Shared/BridgeFilters.cs" Link="BridgeFilters.cs"/></ItemGroup>
  <ItemGroup Condition="'$(TargetFramework)'=='net48'"><Reference Include="System.Net.Http"/></ItemGroup>
 </Project>

@@ -26,20 +26,24 @@ namespace Uvm
     {
         internal static readonly ILog Log=LogManager.GetLogger("UVM");
         Settings settings;
+        UnityEngine.GameObject pump;
         public void OnLoad(UpdateSystem updateSystem)
         {
-            settings=new Settings(this);settings.RegisterInOptionsUI();
+            settings=new Settings(this);
+            pump=new UnityEngine.GameObject("UVM inventory");UnityEngine.Object.DontDestroyOnLoad(pump);
+            pump.AddComponent<InventoryPump>().Inventory=settings.Inventory;
+            settings.RegisterInOptionsUI();
             GameManager.instance.localizationManager.AddSource("en-US",new Locale(settings));
-            Log.Info("Unified Verified Mods 0.3.0 loaded. Open Options > Unified Verified Mods to check downloaded code mods.");
+            Log.Info("Unified Verified Mods 0.5.0 loaded. Open Options > Unified Verified Mods to check downloaded code mods.");
         }
-        public void OnDispose(){settings?.Stop();settings?.UnregisterInOptionsUI();settings=null;}
+        public void OnDispose(){settings?.Stop();settings?.UnregisterInOptionsUI();settings=null;if(pump!=null)UnityEngine.Object.Destroy(pump);}
     }
 
     [FileLocation("ModsSettings/UVM/UVM")]
-    [SettingsUITabOrder("Scan", "Report")]
-    [SettingsUIGroupOrder("Verification", "Summary", "Package", "Export")]
+    [SettingsUITabOrder("Scan", "Report", "Filters")]
+    [SettingsUIGroupOrder("Verification", "Inventory", "Summary", "Package", "Export")]
     [SettingsUIShowGroupName("Package")]
-    public sealed class Settings : ModSetting
+    public sealed partial class Settings : ModSetting
     {
         CancellationTokenSource cancellation=new CancellationTokenSource();
         int running;
@@ -50,6 +54,11 @@ namespace Uvm
         readonly string reportFolder=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"AppData","LocalLow","Colossal Order","Cities Skylines II","ModsData","UVM");
         public Settings(IMod mod):base(mod)
         {
+            LoadFilters();
+            Inventory=new ModInventory(()=>scanResults,()=>scanTime);
+            // Listen automatically on first use, while retaining an explicit opt-out.
+            bool connect=true;try{if(File.Exists(BridgeConfig))connect=(bool?)JObject.Parse(File.ReadAllText(BridgeConfig))["enabled"]??true;}catch{}
+            EnableObserveBridge=connect;
             var path=Path.Combine(reportFolder,"report.json");
             if(!File.Exists(path))return;
             try
@@ -58,6 +67,7 @@ namespace Uvm
                 var saved=JArray.Parse(File.ReadAllText(path));
                 var metadata=Scanner.ReadMetadata(Scanner.DefaultRoot);
                 foreach(JObject row in saved)Scanner.AddMetadata(row,(string)row["folder"]??"",metadata);
+                scanResults=saved;scanTime=File.GetLastWriteTimeUtc(path).ToString("O");
                 report=ScanReport.From(saved,File.GetLastWriteTime(path));
                 status="Previous results are available in Report.";
             }
@@ -104,9 +114,11 @@ namespace Uvm
         public bool OpenReport {set{if(value){var path=Path.Combine(reportFolder,"report.html");if(File.Exists(path))Process.Start(new ProcessStartInfo(path){UseShellExecute=true});else status="Run a scan first to create the report.";}}}
         [XmlIgnore,SettingsUIButton,SettingsUISection("Scan","Verification")]
         public bool OpenRegistry {set{if(value)Process.Start(new ProcessStartInfo(Scanner.Origin){UseShellExecute=true});}}
+        [XmlIgnore,SettingsUIButton,SettingsUISection("Scan","Verification")]
+        public bool OpenObserver {set{if(value)Process.Start(new ProcessStartInfo("https://vezit.net#observer"){UseShellExecute=true});}}
         public bool IsRunning()=>Volatile.Read(ref running)!=0;
         public override void SetDefaults(){}
-        internal void Stop()=>cancellation.Cancel();
+        internal void Stop(){cancellation.Cancel();bridge?.Dispose();Inventory.Dispose();}
         void Start()
         {
             if(Interlocked.CompareExchange(ref running,1,0)!=0)return;
@@ -116,13 +128,16 @@ namespace Uvm
                 try
                 {
                     var results=await Scanner.Scan(Scanner.DefaultRoot,Scanner.Origin,s=>status=s,cancellation.Token);
-                    report=ScanReport.From(results,DateTime.Now);
+                    ObserveActivity.Record("network","Completed UVM registry build-evidence lookups",Scanner.Origin);
+                    scanResults=results;scanTime=DateTimeOffset.UtcNow.ToString("O");
+                    report=ScanReport.From(results,DateTime.Now);Inventory.Invalidate();
                     Interlocked.Increment(ref reportVersion);
                     Directory.CreateDirectory(reportFolder);
                     File.WriteAllText(Path.Combine(reportFolder,"report.json"),results.ToString(Formatting.Indented));
                     var html=new StringBuilder("<!doctype html><html lang='en'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>UVM scan report</title><style>body{font:16px/1.6 system-ui;background:#f6f7f2;color:#193d31;max-width:1000px;margin:40px auto;padding:24px}table{border-collapse:collapse;width:100%;background:white}td,th{text-align:left;padding:14px;border-bottom:1px solid #ddd}small{color:#68756b}a{color:#226246}</style><h1>Unified Verified Mods</h1><p>Downloaded mod cache · "+WebUtility.HtmlEncode(DateTimeOffset.Now.ToString("g"))+"</p><p>Cached mods may include disabled or older versions. A reproduced build is not a safety audit. Results reflect this scan only.</p><table><tr><th>Paradox mod</th><th>Evidence</th><th>Details</th></tr>");
                     foreach(JObject row in results){var id=(string)row["mod_id"];html.Append("<tr><td><a href='https://mods.paradoxplaza.com/mods/"+Uri.EscapeDataString(id)+"/Windows'>"+WebUtility.HtmlEncode((string)row["name"]??id)+"</a><br><small>Version "+WebUtility.HtmlEncode((string)row["version"]??"unknown")+" · revision "+WebUtility.HtmlEncode((string)row["paradox_revision"])+" · ID "+WebUtility.HtmlEncode(id)+"</small></td><td>"+WebUtility.HtmlEncode((string)row["status"])+"</td><td>"+WebUtility.HtmlEncode((string)row["reason"])+"</td></tr>");}
                     html.Append("</table><p><a href='https://vezit.net'>Inspect evidence at vezit.net →</a></p></html>");File.WriteAllText(Path.Combine(reportFolder,"report.html"),html.ToString(),Encoding.UTF8);
+                    ObserveActivity.Record("file","Saved scan report",reportFolder);
                     status=$"Scan complete: {results.Count} packages. Open the Report tab for results.";Mod.Log.Info(status);
                 }
                 catch(OperationCanceledException){status="Scan cancelled.";}
@@ -181,6 +196,11 @@ namespace Uvm
     {
         readonly Dictionary<string,string> entries;
         public Locale(Settings s){entries=new Dictionary<string,string>{
+            {s.GetOptionLabelLocaleID(nameof(Settings.OpenObserver)),"Observer"},{s.GetOptionDescLocaleID(nameof(Settings.OpenObserver)),"Learn about Observe and download its optional Windows installer at vezit.net#observer."},
+            {s.GetOptionTabLocaleID("Filters"),"Filters"},
+            {s.GetOptionLabelLocaleID(nameof(Settings.CodeModsOnly)),"Code mods only"},{s.GetOptionDescLocaleID(nameof(Settings.CodeModsOnly)),"Hide content-only packages from the Scan list. Enabled by default. Code is detected from packaged DLLs, scripts and other executable files, including subfolders. Packages with incomplete inspection stay visible. The Report tab retains the full scan."},
+            {s.GetOptionLabelLocaleID(nameof(Settings.LoadedModsOnly)),"Loaded mods only"},{s.GetOptionDescLocaleID(nameof(Settings.LoadedModsOnly)),"Only show mods whose code is loaded in this game process. Turn off to include downloaded, disabled and local packages. Filters are saved for next time."},
+            {s.GetOptionLabelLocaleID(nameof(Settings.EnableObserveBridge)),"Connect to Observe on this PC"},{s.GetOptionDescLocaleID(nameof(Settings.EnableObserveBridge)),"Share mod names, loaded assemblies, build scan results, compiled API references and cooperative activity receipts with Observe for this Windows user. No network port or automatic uploads. Turn off to disconnect."},
             {s.GetSettingsLocaleID(),"Unified Verified Mods"},{s.GetOptionTabLocaleID("Scan"),"Scan"},{s.GetOptionTabLocaleID("Report"),"Report"},
             {s.GetOptionGroupLocaleID("Verification"),"Build evidence"},{s.GetOptionGroupLocaleID("Package"),"Package results"},
             {s.GetOptionLabelLocaleID(nameof(Settings.Status)),"Scan status"},{s.GetOptionDescLocaleID(nameof(Settings.Status)),"Evidence from distinct GitHub accounts. Reproducibility does not establish that a mod is safe."},

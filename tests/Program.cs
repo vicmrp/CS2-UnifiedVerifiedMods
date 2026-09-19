@@ -53,6 +53,17 @@ class Program
   var cache=Path.Combine(workspace,"cache");Directory.CreateDirectory(cache);
   File.WriteAllText(Path.Combine(cache,"pdx_mods_cache.json"),"invalid JSON");
   check(Scanner.ReadMetadata(Path.Combine(cache,"pdx_mods")).Count==0,"Malformed metadata does not stop scans");
+  check(ModCodeClassifier.HasCode(package)==true,"Code classification does not depend on known API calls or verification");
+  var assets=Path.Combine(workspace,"asset-package");Directory.CreateDirectory(assets);File.WriteAllText(Path.Combine(assets,"building.asset"),"fixture");
+  check(ModCodeClassifier.HasCode(assets)==false,"Content-only package excluded from code filter");
+  var scripts=Path.Combine(workspace,"script-package","UI");Directory.CreateDirectory(scripts);File.WriteAllText(Path.Combine(scripts,"main.js"),"// fixture");
+  check(ModCodeClassifier.HasCode(Path.GetDirectoryName(scripts))==true,"Nested UI scripts count as code");
+  check(ModCodeClassifier.HasCode(Path.Combine(workspace,"missing-package"))==null,"Unreadable package is not silently declared content-only");
+  var a=new Uvm.Bridge.BridgeFilters(Path.Combine(workspace,"game-filters"));var b=new Uvm.Bridge.BridgeFilters(Path.Combine(workspace,"observer-filters"));
+  a.Set(false,true);b.Merge(a.Wire);check(!b.CodeOnly&&b.LoadedOnly,"Game filter edit reaches Observe");
+  var stale=a.Wire;b.Set(true,false);a.Merge(b.Wire);check(a.CodeOnly&&!a.LoadedOnly,"Observe filter edit reaches game");
+  check(!a.Merge(stale),"Reconnect cannot replay older filters");
+  check(new Uvm.Bridge.BridgeFilters(Path.Combine(workspace,"game-filters")).Wire==a.Wire,"Filter revisions survive restart");
   Console.WriteLine(count+" client checks passed.");return 0;
  }
 }
